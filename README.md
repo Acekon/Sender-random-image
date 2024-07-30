@@ -1,1 +1,1 @@
-# Telegram-sender-random-image
+# Telegram and Discord  sender random image
