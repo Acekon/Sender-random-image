@@ -55,18 +55,29 @@ def get_random_image_path():
 
 
 def move_image(image_path):
+    logger.info(f"Moving image {image_path}")
     shutil.move(image_path, DESTINATION_DIR)
+
+
+def task_tg_send_photo(image_path):
+    logger.info(f'Task tg start sending random message')
+    tg_img = tg_send_photo(file_path=image_path, send_to=TG_CHAT_ID)
+    if tg_img.get('ok'):
+        logger.info(f'Send: {tg_img}')
+    else:
+        logger.error(f'Not send: {tg_img}')
+        return False
+    logger.info(f'Task tg end sending random message')
+    return True
 
 
 def task_send_random_message():
     image_path = get_random_image_path()
-    tg_img = tg_send_photo(file_path=image_path, send_to=TG_CHAT_ID)
-    if tg_img.get('ok'):
-        move_image(image_path)
-        return 'Send'
-    else:
-        print(tg_img)
-        return 'Not send'
+    logger.info(f'Image open {image_path}')
+    task_tg_send_photo(image_path)
+    move_image(image_path)
+
+
 
 
 def main_run():
@@ -80,6 +91,6 @@ def main_run():
 
 
 if __name__ == '__main__':
-    print(task_send_random_message())
+    task_send_random_message()
     # logging.basicConfig(level=logging.ERROR, stream=sys.stdout)
     # main_run()
