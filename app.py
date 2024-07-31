@@ -88,15 +88,13 @@ def task_discord_send_photo(image_path):
 def task_send_random_message():
     image_path = get_random_image_path()
     logger.info(f'Image open {image_path}')
-    # task_tg_send_photo(image_path)
+    task_tg_send_photo(image_path)
     task_discord_send_photo(image_path)
-    #move_image(image_path)
-
-
+    move_image(image_path)
 
 
 def main_run():
-    start_times = ['14:55']
+    start_times = ['11:40', '11:41']*2
     print(f'Task will sending : {start_times}')
     for times in start_times:
         schedule.every().day.at(times).do(task_send_random_message)
@@ -106,6 +104,4 @@ def main_run():
 
 
 if __name__ == '__main__':
-    task_send_random_message()
-    # logging.basicConfig(level=logging.ERROR, stream=sys.stdout)
-    # main_run()
+    main_run()
