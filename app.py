@@ -1,3 +1,4 @@
+import asyncio
 import fnmatch
 import os
 import random
@@ -8,6 +9,7 @@ import shutil
 from dotenv import load_dotenv
 import schedule
 
+from bots.discord_task import discord_send_photo
 from bots.tg_task import tg_send_photo
 
 load_dotenv()
@@ -60,14 +62,26 @@ def move_image(image_path):
 
 
 def task_tg_send_photo(image_path):
-    logger.info(f'Task tg start sending random message')
+    logger.info(f'Task TG start sending random message')
     tg_img = tg_send_photo(file_path=image_path, send_to=TG_CHAT_ID)
     if tg_img.get('ok'):
-        logger.info(f'Send: {tg_img}')
+        logger.info(f'Send TG successfully: {tg_img}')
     else:
-        logger.error(f'Not send: {tg_img}')
+        logger.error(f'Send TG not successfully: {tg_img}')
         return False
-    logger.info(f'Task tg end sending random message')
+    logger.info(f'Task TG end sending random message')
+    return True
+
+
+def task_discord_send_photo(image_path):
+    logger.info(f'Task Discord start sending random message')
+    discord_result = asyncio.run(discord_send_photo(img_path=image_path))
+    if discord_result:
+        logger.info(f'Send Discord successfully: {image_path}')
+    else:
+        logger.error(f'Send Discord not successfully: {image_path}')
+        return False
+    logger.info(f'Task Discord end sending random message')
     return True
 
 
@@ -75,13 +89,12 @@ def task_send_random_message():
     image_path = get_random_image_path()
     logger.info(f'Image open {image_path}')
     task_tg_send_photo(image_path)
+    task_discord_send_photo(image_path)
     move_image(image_path)
 
 
-
-
 def main_run():
-    start_times = ['14:55']
+    start_times = ['11:40', '11:41']*2
     print(f'Task will sending : {start_times}')
     for times in start_times:
         schedule.every().day.at(times).do(task_send_random_message)
@@ -91,6 +104,4 @@ def main_run():
 
 
 if __name__ == '__main__':
-    task_send_random_message()
-    # logging.basicConfig(level=logging.ERROR, stream=sys.stdout)
-    # main_run()
+    main_run()
